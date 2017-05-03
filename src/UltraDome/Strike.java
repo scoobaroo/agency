@@ -1,13 +1,15 @@
 package UltraDome;
 
-public class Strike {
+import Agency.Message;
+
+public class Strike extends Message{
+	public StrikeTypes type;
+	public String description;
 	public int strength;
-	public int getStrength() {
-		return strength;
+	public Strike(String desc) {
+		super(desc);
 	}
-	public void setStrength(int strength) {
-		this.strength = strength;
-	}
+	
 	public void execute(){
 		
 	}
