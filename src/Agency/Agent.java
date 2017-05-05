@@ -3,7 +3,7 @@ package Agency;
 import java.util.Queue;
 
 public abstract class Agent extends Thread implements Runnable {
-	protected int id;
+	public int id;
 	public boolean dead;
 	protected boolean done;
 	protected Dispatcher dispatcher = null;

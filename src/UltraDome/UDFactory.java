@@ -11,11 +11,11 @@ public class UDFactory implements AgentFactory {
 		return new Gladiator(startid);
 	}
 	public Weapon makeWeapon(String type){
-		if(type=="sword") return new Sword();
-		else if (type=="gun") return new Gun();
-		else if (type == "bazooka") return new Bazooka();
-		else if (type == "wand") return new Wand();
-		else if (type == "flamethrower") return new Flamethrower();
+		if(type=="sword") return new Sword("Sword");
+		else if (type=="gun") return new Gun("Gun");
+		else if (type == "bazooka") return new Bazooka("Bazooka");
+		else if (type == "wand") return new Wand("Wand");
+		else if (type == "flamethrower") return new Flamethrower("Flamethrower");
 		return null;
 	}
 	public Medicine makeMedicine(){
@@ -25,23 +25,19 @@ public class UDFactory implements AgentFactory {
 	public ShieldSkin makeSS(){
 		int r = rand.nextInt(8);
 		if (r>0 && r<2){
-			ShieldSkin ice = new ShieldSkin();
-			ice.type = StrikeTypes.ICE;
+			ShieldSkin ice = new IceSkin();
 			return ice;
 		}
 		else if (r>=2 && r<4){
-			ShieldSkin fire = new ShieldSkin();
-			fire.type = StrikeTypes.FIRE;
+			ShieldSkin fire = new FireSkin();
 			return fire;
 		}
 		else if (r>=4 && r<6){
-			ShieldSkin poison = new ShieldSkin();
-			poison.type = StrikeTypes.POISON;
+			ShieldSkin poison = new PoisonSkin();
 			return poison;
 		}
 		else {
-			ShieldSkin magic = new ShieldSkin();
-			magic.type = StrikeTypes.MAGIC;
+			ShieldSkin magic = new MagicSkin();
 			return magic;
 		}
 	}

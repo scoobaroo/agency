@@ -1,11 +1,9 @@
 package UltraDome;
 
 public class ShieldSkin implements Shield{
-	public StrikeTypes type;
+	public Shield delegate;
 	public Strike reduceStrike(Strike s) {
-		if(s.type == type){
-			s.strength = (int) (s.strength * 0.4);
-		}
+		s = delegate.reduceStrike(s);
 		return s;
 	}
 }
