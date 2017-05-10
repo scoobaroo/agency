@@ -8,35 +8,70 @@ import Agency.AgentFactory;
 import Agency.Dispatcher;
 
 public class Ultradome extends Dispatcher {
-	public ArrayList<Weapon> weapons = new ArrayList<Weapon>();
-	public ArrayList<Medicine> medicines = new ArrayList<Medicine>();
-	public ArrayList<ShieldSkin> shieldskins = new ArrayList<ShieldSkin>();
+	public static ArrayList<Weapon> weapons = new ArrayList<Weapon>();
+	public static ArrayList<Medicine> medicines = new ArrayList<Medicine>();
+	public static ArrayList<ShieldSkin> shieldskins = new ArrayList<ShieldSkin>();
 	static AgentFactory udFactory;
-	public Random rand;
-	public synchronized Medicine getMedicine(){
-		int index = rand.nextInt(medicines.size()-1)
-		return medicines.remove(index);
+	public static Random rand = new Random();
+	public Ultradome getUltradome(){
+		return this;
 	}
-	public synchronized Weapon getWeapon(){
-		int index = rand.nextInt(weapons.size()-1)
-		return weapons.remove(index);
+	public static synchronized Medicine getMedicine(){
+		System.out.println("Inside getMedicine() of ultradome");
+		if(medicines.size()==1){
+			return medicines.remove(0);
+		}
+		else if(medicines.size()>1){
+			int index = rand.nextInt(medicines.size()-1);
+			Medicine m = medicines.remove(index);
+			return m;
+		} else return null;
 	}
-	public synchronized ShieldSkin getShieldSkin(){
-		int index = rand.nextInt(shieldskins.size()-1)
-		return shieldskins.remove(index);
+	public static synchronized Weapon getWeapon(){
+		System.out.println("Inside getWeapon() of ultradome");
+		if(weapons.size()==1){
+			return weapons.remove(0);
+		}
+		else if(weapons.size()>1){
+			int index = rand.nextInt(weapons.size()-1);
+			Weapon w = weapons.remove(index);
+			return w;
+		} else return null;
+	}
+	public static synchronized ShieldSkin getShieldSkin(){
+		System.out.println("Inside getShieldSkin() of ultradome");
+		if(shieldskins.size()==1){
+			return shieldskins.remove(0);
+		}
+		else if(shieldskins.size()>1){
+			int index = rand.nextInt(shieldskins.size()-1);
+			ShieldSkin ss = shieldskins.remove(index);
+			return ss;
+		} else return null;
 	}
 	public Ultradome(){
+		System.out.println("Making wepoans, medicine, and shieldskins for Ultradome");
 		UDFactory uf = new UDFactory();
 		Weapon sword = uf.makeWeapon("sword");
 		Weapon gun = uf.makeWeapon("gun");
 		Weapon bazooka = uf.makeWeapon("bazooka");
 		Weapon wand = uf.makeWeapon("wand");
 		Weapon flamethrower = uf.makeWeapon("flamethrower");
+		Weapon sword2 = uf.makeWeapon("sword");
+		Weapon gun2 = uf.makeWeapon("gun");
+		Weapon bazooka2 = uf.makeWeapon("bazooka");
+		Weapon wand2 = uf.makeWeapon("wand");
+		Weapon flamethrower2 = uf.makeWeapon("flamethrower");
 		weapons.add(sword);
 		weapons.add(gun);
 		weapons.add(bazooka);
 		weapons.add(wand);
 		weapons.add(flamethrower);
+		weapons.add(sword2);
+		weapons.add(gun2);
+		weapons.add(bazooka2);
+		weapons.add(wand2);
+		weapons.add(flamethrower2);
 		for(int i=0; i<20; i++){
 			Medicine m = uf.makeMedicine();
 			medicines.add(m);
@@ -44,34 +79,8 @@ public class Ultradome extends Dispatcher {
 			shieldskins.add(ss);
 		}
 	}
-	public boolean stillAlive(){
-		for (Agent g : agents){
-			if(!g.dead) return true;
-		}
-		return false;
-	}
-	
-	public void start() {
-		for(Agent a1: agents) {
-			Gladiator g1 = (Gladiator) a1;
-			if (g1.health > 0) {
-				for(Agent a2: agents) {
-					Gladiator g2 = (Gladiator) a2;
-					if (g1 != g2 && g2.health > 0) {
-						g1.attack(g2);
-						if (g1.health <= 0) {
-							System.out.println("Gladiator."+g1.id + " has been killed!");
-						}
-						if (g2.health <= 0) {
-							System.out.println("Gladiator."+g2.id + " has been killed!");
-						}
-					}
-				}
-			}
-		}
-	}
 
-	public Gladiator getWinner() {
+	public static Gladiator getWinner() {
 		Gladiator winner = (Gladiator) agents.get(0);
 		for(Agent a: agents) {
 			Gladiator g= (Gladiator) a;
@@ -82,19 +91,25 @@ public class Ultradome extends Dispatcher {
 		return winner;
 	}
 
-	public static void main(String[] args) {
-		System.out.println("Inside ULTRADOME");
+	public static void main(String[] args) throws InterruptedException{
+		System.out.println("Inside ULTRADOME!");
 		Ultradome ud = new Ultradome();
 		ud.multiThread = false;
 		UDFactory uf = new UDFactory();
 		Gladiator g1 = uf.makeAgent();
 		Gladiator g2 = uf.makeAgent();
 		Gladiator g3 = uf.makeAgent();
-		ud.agents.add(g1);
-		ud.agents.add(g2);
-		ud.agents.add(g3);
+		Gladiator g4 = uf.makeAgent();
+		Gladiator g5 = uf.makeAgent();
+		Gladiator g6 = uf.makeAgent();
+		Ultradome.agents.add(g1);
+		Ultradome.agents.add(g2);
+		Ultradome.agents.add(g3);
+		Ultradome.agents.add(g4);
+		Ultradome.agents.add(g5);
+		Ultradome.agents.add(g6);
 		ud.start();
-		Gladiator winner = ud.getWinner();
-		System.out.println("The ultimate warrior is " + winner);
+		Gladiator winner = Ultradome.getWinner();
+		System.out.println("The ultimate warrior is Gladiator." + winner.id);
 	}
 }

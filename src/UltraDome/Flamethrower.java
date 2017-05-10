@@ -6,7 +6,7 @@ public class Flamethrower extends Weapon {
 	}
 	public Strike makeStrike() {
 		Strike s = new Strike("Shoots a giant flame from his flamethrower initial strength=");
-		s.strength = (int) (attacker.health * 0.35); 
+		s.strength = (int) (attacker.health * 0.25); 
 		s.type = StrikeTypes.FIRE;
 		System.out.println(s.description);
 		System.out.println(s.strength);

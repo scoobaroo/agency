@@ -8,7 +8,8 @@ public class UDFactory implements AgentFactory {
 	int startid = 0;
 	public Gladiator makeAgent() {
 		++startid;
-		return new Gladiator(startid);
+		Gladiator g = new Gladiator(startid);
+		return g;
 	}
 	public Weapon makeWeapon(String type){
 		if(type=="sword") return new Sword("Sword");

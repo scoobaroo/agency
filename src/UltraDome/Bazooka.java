@@ -12,5 +12,4 @@ public class Bazooka extends Weapon{
 		System.out.println(s.strength);
 		return s;
 	}
-
 }
