@@ -17,7 +17,14 @@ public class Prisoner extends Agent {
     public Prisoner(int id){
             super(id);
     }
-    public void update(){}
+    public void update(){
+        Message m = mailBox.poll();
+        if (m == null) interact();
+        else while(m != null) {
+                respond(m);
+                m = mailBox.poll();
+        }
+    }
     
     public <Choice> void update(){
         Message<Choice> msg = (Message<Choice>) mailBox.poll();
@@ -120,17 +127,21 @@ public class Prisoner extends Agent {
     }
 
     @SuppressWarnings("unchecked")
-    public <Choice> void respond(Message<Choice> msg){
+    public <Choice> void respond(Message msg){
         msg = (Message<Choice>) (Choice) msg;
         Choice decision = (Choice) strategy(history.get(msg.sender));
         Prison.send(msg.sender, (Message<T>) new Message<Choice>(this,decision));
         updateScore(decision, msg.content);
         updateHistory((Prisoner) msg.sender, (Choice) msg.content);
-        /* 
-         * use strategy to decide D/C
-         * send to partner
-         * update score 
-         */
+        //////////////////////////////////
+        Agent p = msg.sender;
+        if (!msg.response) {
+            Choice myChoice = strategy(history.get(p));
+            Prison.send(new Message(this, myChoice));
+        }
+        Choice partnersChoice = msg.choice;
+        updateScore(myChoice, partnersChoice);
+        updateHistory(p, partnersChoice);
     }
         
     public void updateHistory(Prisoner p, Choice c){
@@ -152,8 +163,9 @@ public class Prisoner extends Agent {
 
     @Override
     public void interact(Agent a) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Prisoner p = (Prisoner) Prison.getPartner(this);
+	Choice c = strategy(history.get(p));
+	Prison.send(new Message(this, c));
     }
-
 
 }
