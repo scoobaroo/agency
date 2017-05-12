@@ -4,168 +4,179 @@ import java.util.HashMap;
 
 import Agency.Agent;
 import Agency.Message;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@SuppressWarnings("hiding")
 public class Prisoner extends Agent {
     public HashMap<Prisoner, int[]> history;
     public int[] strategy = new int[4];
     public int score = 0;
-
+    public int gamesPlayed = 0;
     public Prisoner(){}
     public Prisoner(int id){
             super(id);
-    }
-    public void update(){
-        Message m = mailBox.poll();
-        if (m == null) interact();
-        else while(m != null) {
-                respond(m);
-                m = mailBox.poll();
-        }
+            mailBox=new LinkedList<Message>();
+            history = new HashMap<Prisoner, int[]>();
     }
     
-    public <Choice> void update(){
-        Message<Choice> msg = (Message<Choice>) mailBox.poll();
-        if (msg !=null) respond(msg);
-        else interact(); 
+    @SuppressWarnings("unchecked")
+	public void update(){
+        System.out.println(this);
+        System.out.println("Inside Prisoner's update function");
+        System.out.println(mailBox);
+        gamesPlayed++;
+        if(gamesPlayed>100){
+            die();
+        }
+        if(!mailBox.isEmpty()){
+            Message m = mailBox.poll();
+            if (m == null) interact();
+            else while(m != null) {
+                respond(m);
+                m = mailBox.poll();
+            }
+        } else interact();
+    }
+    
+    @Override
+    public void interact(Agent a) {
+        Prisoner p = (Prisoner) Prison.getPartner(this);
+        Choice c = strategy(history.get(p));
+        Prison.send(p, new Message(this, c));
     }
 
+    
     @Override
     public void interact() {
         Prisoner p = (Prisoner) Prison.getPartner(this);
-        Choice c = strategy(history.get(p));
-        Prison.send(p, new Message<Choice>((Prisoner) this, c));
-        try {
-            sleep(1000);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(Prisoner.class.getName()).log(Level.SEVERE, null, ex);
+        Choice c =null;
+        System.out.println(p);
+        System.out.println(history);
+        if(history.get(p) == null){
+            int[] initArray = {0,0};
+            history.put(p,initArray);
         }
-        Message<Choice> msg = (Message<Choice>) mailBox.poll();
-        updateScore(msg.content, c);
+        c = strategy(history.get(p));
+        Prison.send(p, new Message((Prisoner) this, c));
+        Message msg = mailBox.poll();
+        if(msg!=null){
+            System.out.println(msg.content);
+            updateScore(c,(Choice) msg.content);
+        }
     }
 	
     public Choice strategy(int[] hist){
-        if(strategy[0]==0 && strategy[1]==0 && strategy[2]==0 && strategy[3]==0){
-                return Choice.DEFECT;
-        }
-        else if(strategy[0]==0 && strategy[1]==0 && strategy[2]==0 && strategy[3]==1){
-                if(hist[0]==1 && hist[1]==1){
-                        return Choice.COOPERATE;
-                } else return Choice.DEFECT;
-        }
-        else if(strategy[0]==0 && strategy[1]==0 && strategy[2]==1 && strategy[3]==0){
-                if(hist[0]==1 && hist[1]==0){
-                        return Choice.COOPERATE;
-                } else return Choice.DEFECT;
-        }
-        else if(strategy[0]==0 && strategy[1]==0 && strategy[2]==1 && strategy[3]==1){
-                if((hist[0]==1 && hist[1]==1)||(hist[0]==1 && hist[1]==1)){
-                        return Choice.COOPERATE;
-                } else return Choice.DEFECT;
-        }
-        else if(strategy[0]==0 && strategy[1]==1 && strategy[2]==0 && strategy[3]==0){
-                if(hist[0]==0 && hist[1]==1){
-                        return Choice.COOPERATE;
-                } else return Choice.DEFECT;
-        }
-        else if(strategy[0]==0 && strategy[1]==1 && strategy[2]==0 && strategy[3]==1){
-                if((hist[0]==0 && hist[1]==1)||(hist[0]==1 && hist[1]==1)){
-                        return Choice.COOPERATE;
-                } else return Choice.DEFECT;
-        }
-        else if(strategy[0]==0 && strategy[1]==1 && strategy[2]==1 && strategy[3]==0){
-                if((hist[0]==0 && hist[1]==1)||(hist[0]==1 && hist[1]==0)){
-                        return Choice.COOPERATE;
-                } else return Choice.DEFECT;
-        }
-        else if(strategy[0]==0 && strategy[1]==1 && strategy[2]==1 && strategy[3]==1){
-                if(hist[0]==0 && hist[1]==0){
-                        return Choice.DEFECT;
-                } else return Choice.COOPERATE;
-        }
-        else if(strategy[0]==1 && strategy[1]==0 && strategy[2]==0 && strategy[3]==0){
-                if(hist[0]==0 && hist[1]==0){
-                        return Choice.COOPERATE;
-                } else return Choice.DEFECT;
-        }
-        else if(strategy[0]==1 && strategy[1]==0 && strategy[2]==0 && strategy[3]==1){
-                if((hist[0]==0 && hist[1]==0)||(hist[0]==1 && hist[1]==1)){
-                        return Choice.COOPERATE;
-                } else return Choice.DEFECT;
-        }
-        else if(strategy[0]==1 && strategy[1]==0 && strategy[2]==1 && strategy[3]==0){
-                if((hist[0]==0 && hist[1]==0)||(hist[0]==1 && hist[1]==0)){
-                        return Choice.COOPERATE;
-                } else return Choice.DEFECT;
-        }
-        else if(strategy[0]==1 && strategy[1]==0 && strategy[2]==1 && strategy[3]==1){
-                if(hist[0]==0 && hist[1]==1){
-                        return Choice.DEFECT;
-                } else return Choice.COOPERATE;
-        }
-        else if(strategy[0]==1 && strategy[1]==1 && strategy[2]==0 && strategy[3]==0){
-                if((hist[0]==0 && hist[1]==0)||(hist[0]==0 && hist[1]==1)){
-                        return Choice.COOPERATE;
-                } else return Choice.DEFECT;
-        }
-        else if(strategy[0]==1 && strategy[1]==1 && strategy[2]==0 && strategy[3]==1){
-                if(hist[0]==1 && hist[1]==0){
-                        return Choice.DEFECT;
-                } else return Choice.COOPERATE;
-        }
-        else if(strategy[0]==1 && strategy[1]==1 && strategy[2]==1 && strategy[3]==0){
-                if(hist[0]==1 && hist[1]==1){
-                        return Choice.DEFECT;
-                } else return Choice.COOPERATE;
-        }
-        else if(strategy[0]==1 && strategy[1]==1 && strategy[2]==1 && strategy[3]==1){
-                return Choice.COOPERATE;
+        if(hist!=null){
+            System.out.println(hist[0]+""+hist[1]);
+            if(strategy[0]==0 && strategy[1]==0 && strategy[2]==0 && strategy[3]==0){
+                    return Choice.DEFECT;
+            }
+            else if(strategy[0]==0 && strategy[1]==0 && strategy[2]==0 && strategy[3]==1){
+                    if(hist[0]==1 && hist[1]==1){
+                            return Choice.COOPERATE;
+                    } else return Choice.DEFECT;
+            }
+            else if(strategy[0]==0 && strategy[1]==0 && strategy[2]==1 && strategy[3]==0){
+                    if(hist[0]==1 && hist[1]==0){
+                            return Choice.COOPERATE;
+                    } else return Choice.DEFECT;
+            }
+            else if(strategy[0]==0 && strategy[1]==0 && strategy[2]==1 && strategy[3]==1){
+                    if((hist[0]==1 && hist[1]==1)||(hist[0]==1 && hist[1]==1)){
+                            return Choice.COOPERATE;
+                    } else return Choice.DEFECT;
+            }
+            else if(strategy[0]==0 && strategy[1]==1 && strategy[2]==0 && strategy[3]==0){
+                    if(hist[0]==0 && hist[1]==1){
+                            return Choice.COOPERATE;
+                    } else return Choice.DEFECT;
+            }
+            else if(strategy[0]==0 && strategy[1]==1 && strategy[2]==0 && strategy[3]==1){
+                    if((hist[0]==0 && hist[1]==1)||(hist[0]==1 && hist[1]==1)){
+                            return Choice.COOPERATE;
+                    } else return Choice.DEFECT;
+            }
+            else if(strategy[0]==0 && strategy[1]==1 && strategy[2]==1 && strategy[3]==0){
+                    if((hist[0]==0 && hist[1]==1)||(hist[0]==1 && hist[1]==0)){
+                            return Choice.COOPERATE;
+                    } else return Choice.DEFECT;
+            }
+            else if(strategy[0]==0 && strategy[1]==1 && strategy[2]==1 && strategy[3]==1){
+                    if(hist[0]==0 && hist[1]==0){
+                            return Choice.DEFECT;
+                    } else return Choice.COOPERATE;
+            }
+            else if(strategy[0]==1 && strategy[1]==0 && strategy[2]==0 && strategy[3]==0){
+                    if(hist[0]==0 && hist[1]==0){
+                            return Choice.COOPERATE;
+                    } else return Choice.DEFECT;
+            }
+            else if(strategy[0]==1 && strategy[1]==0 && strategy[2]==0 && strategy[3]==1){
+                    if((hist[0]==0 && hist[1]==0)||(hist[0]==1 && hist[1]==1)){
+                            return Choice.COOPERATE;
+                    } else return Choice.DEFECT;
+            }
+            else if(strategy[0]==1 && strategy[1]==0 && strategy[2]==1 && strategy[3]==0){
+                    if((hist[0]==0 && hist[1]==0)||(hist[0]==1 && hist[1]==0)){
+                            return Choice.COOPERATE;
+                    } else return Choice.DEFECT;
+            }
+            else if(strategy[0]==1 && strategy[1]==0 && strategy[2]==1 && strategy[3]==1){
+                    if(hist[0]==0 && hist[1]==1){
+                            return Choice.DEFECT;
+                    } else return Choice.COOPERATE;
+            }
+            else if(strategy[0]==1 && strategy[1]==1 && strategy[2]==0 && strategy[3]==0){
+                    if((hist[0]==0 && hist[1]==0)||(hist[0]==0 && hist[1]==1)){
+                            return Choice.COOPERATE;
+                    } else return Choice.DEFECT;
+            }
+            else if(strategy[0]==1 && strategy[1]==1 && strategy[2]==0 && strategy[3]==1){
+                    if(hist[0]==1 && hist[1]==0){
+                            return Choice.DEFECT;
+                    } else return Choice.COOPERATE;
+            }
+            else if(strategy[0]==1 && strategy[1]==1 && strategy[2]==1 && strategy[3]==0){
+                    if(hist[0]==1 && hist[1]==1){
+                            return Choice.DEFECT;
+                    } else return Choice.COOPERATE;
+            }
+            else if(strategy[0]==1 && strategy[1]==1 && strategy[2]==1 && strategy[3]==1){
+                    return Choice.COOPERATE;
+            }
         }
         return null;
+        
     }
 
-    @SuppressWarnings("unchecked")
-    public <Choice> void respond(Message msg){
-        msg = (Message<Choice>) (Choice) msg;
-        Choice decision = (Choice) strategy(history.get(msg.sender));
-        Prison.send(msg.sender, (Message<T>) new Message<Choice>(this,decision));
-        updateScore(decision, msg.content);
-        updateHistory((Prisoner) msg.sender, (Choice) msg.content);
-        //////////////////////////////////
-        Agent p = msg.sender;
-        if (!msg.response) {
-            Choice myChoice = strategy(history.get(p));
-            Prison.send(new Message(this, myChoice));
+    @SuppressWarnings({"unchecked", "empty-statement"})
+    public void respond(Message msg){
+        msg = (Message<Choice>) msg;
+        Prisoner p = (Prisoner) msg.sender;
+        if(history.get(p)==null){
+            int[] initArray = {0,0};
+            history.put(p, initArray);
         }
-        Choice partnersChoice = msg.choice;
-        updateScore(myChoice, partnersChoice);
-        updateHistory(p, partnersChoice);
+        Choice decision = (Choice) strategy(history.get((Prisoner)msg.sender));
+        Prison.send(msg.sender, new Message(this, decision));
+        updateScore(decision, (Choice) msg.content);
+        updateHistory((Prisoner) msg.sender, (Choice) msg.content);
     }
         
     public void updateHistory(Prisoner p, Choice c){
         int choiceInteger;
         if (c == Choice.DEFECT) choiceInteger = 0; 
         else choiceInteger = 1;
-        if(history.get(p).length>=1){
-            history.get(p)[1]= history.get(p)[0];
-            history.get(p)[0]=choiceInteger;
-        } else history.get(p)[0]=choiceInteger;
+        (history.get(p))[1] = (history.get(p))[0];
+        (history.get(p))[0] = choiceInteger;
     }
 
-    private <Choice> void updateScore(Choice c1, Choice c2) {
+    private void updateScore(Choice c1, Choice c2) {
         if(c1 == Choice.COOPERATE && c2 == Choice.COOPERATE) score += 3;
         else if(c1 == Choice.DEFECT && c2 == Choice.DEFECT) score += 1;
         else if(c1 == Choice.DEFECT && c2 == Choice.COOPERATE) score += 5;
         else score += 0;
     }
-
-    @Override
-    public void interact(Agent a) {
-        Prisoner p = (Prisoner) Prison.getPartner(this);
-	Choice c = strategy(history.get(p));
-	Prison.send(new Message(this, c));
-    }
-
 }
