@@ -82,7 +82,6 @@ public class Ultradome extends Dispatcher {
 
 	public static Gladiator getWinner() {
 		Gladiator winner = (Gladiator) Ultradome.agents.get(0);
-                winner.health=0;
 		for(Agent a: agents) {
 			Gladiator g= (Gladiator) a;
 			if (g.health > winner.health) {
@@ -106,7 +105,7 @@ public class Ultradome extends Dispatcher {
 	public static void main(String[] args) throws InterruptedException{
 		System.out.println("Inside ULTRADOME!");
 		Ultradome ud = new Ultradome();
-		ud.multiThread = false;
+		ud.multiThread = true;
 		UDFactory uf = new UDFactory();
 		Gladiator g1 = uf.makeAgent();
 		Gladiator g2 = uf.makeAgent();

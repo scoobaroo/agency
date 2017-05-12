@@ -16,23 +16,19 @@ public abstract class Agent extends Thread implements Runnable {
             dead=false;
             partner = null;
             id= i;
-			mailBox = new LinkedList<Message>();
+            mailBox = new LinkedList<Message>();
 	}
-	public void die(){
+	public synchronized void die(){
 		dead=true;
 	}
-	public synchronized void run(){
-		while(!dead){
-			update();
-			yield();
-		}
-	}
+
 	public synchronized void start(){
-		while(!dead){
-			update();
-			yield();
-		}
+            if(!dead){
+                update();
+                yield();
+            }
 	}
+        
 	public void halt(){
 		
 	}

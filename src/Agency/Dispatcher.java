@@ -17,14 +17,9 @@ public abstract class Dispatcher {
     public synchronized static Agent getPartner(Agent a){
         Agent a2 = null;
         int count = 0;
-        ArrayList<Agent> deadagents = new ArrayList<Agent>();
-        ArrayList<Agent> liveagents = new ArrayList<Agent>();
-        if(liveagents.size()==1) return a;
-        else while(a.partner==null){
+        while(a.partner==null){
             int i = rand.nextInt(agents.size()-1);
             a2 = agents.get(i);
-            if(a2.dead) deadagents.add(a2); 
-            else liveagents.add(a2);
             count++;
             if(a2.partner==null && !a2.dead && a2!=a){
                 a.partner = a2;
@@ -32,7 +27,7 @@ public abstract class Dispatcher {
                 System.out.println("inside GETPARTNER:::" + a2);
                 return a2;
             }
-            if(count>=agents.size()){
+            if(count>=agents.size()*2){
                 System.out.println("breaking from getpartner");
                 break;
             }
@@ -59,12 +54,13 @@ public abstract class Dispatcher {
         if(multiThread){
             while(!quit()){
                 for (Agent a: agents){
-                    while(!a.dead){
+                    if(!a.dead){
                         a.start();
                         a.join();
                     }
                 }
             }
+            cleanUp();
         }else{
             while(!quit()){
                 for(Agent a : agents){

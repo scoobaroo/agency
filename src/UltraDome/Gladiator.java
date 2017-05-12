@@ -94,7 +94,7 @@ public class Gladiator extends Agent {
                     }
 		}
 		else {
-                    System.out.println("Gladiator."+this.id +"is looking for a partner");
+                    System.out.println("Gladiator."+this.id +" is looking for a partner");
                     if(Ultradome.agents.size()>1){
                         System.out.println("Calling Ultradomes getPartner()");
                         Gladiator p = (Gladiator) Ultradome.getPartner(this);
@@ -102,9 +102,6 @@ public class Gladiator extends Agent {
                         attack((Gladiator) partner);
                         partner.partner = null;
                         partner = null;
-                    } else {
-                        Ultradome.getWinner();
-                        System.out.println("Ultimate warrior is Gladiator."+this.id);
                     }
 		}
 	}

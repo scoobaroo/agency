@@ -22,9 +22,8 @@ public class Prisoner extends Agent {
     }
     
     @SuppressWarnings("unchecked")
-	public void update(){
-        System.out.println(this);
-        System.out.println("Inside Prisoner's update function");
+    public void update(){
+        System.out.println("Inside Prisoner."+id+"'s update function");
         System.out.println(mailBox);
         gamesPlayed++;
         if(gamesPlayed>100){
@@ -41,19 +40,9 @@ public class Prisoner extends Agent {
     }
     
     @Override
-    public void interact(Agent a) {
-        Prisoner p = (Prisoner) Prison.getPartner(this);
-        Choice c = strategy(history.get(p));
-        Prison.send(p, new Message(this, c));
-    }
-
-    
-    @Override
     public void interact() {
         Prisoner p = (Prisoner) Prison.getPartner(this);
-        Choice c =null;
-        System.out.println(p);
-        System.out.println(history);
+        Choice c = null;
         if(history.get(p) == null){
             int[] initArray = {0,0};
             history.put(p,initArray);
@@ -62,7 +51,7 @@ public class Prisoner extends Agent {
         Prison.send(p, new Message((Prisoner) this, c));
         Message msg = mailBox.poll();
         if(msg!=null){
-            System.out.println(msg.content);
+            updateHistory(p, (Choice) msg.content);
             updateScore(c,(Choice) msg.content);
         }
     }
@@ -84,7 +73,7 @@ public class Prisoner extends Agent {
                     } else return Choice.DEFECT;
             }
             else if(strategy[0]==0 && strategy[1]==0 && strategy[2]==1 && strategy[3]==1){
-                    if((hist[0]==1 && hist[1]==1)||(hist[0]==1 && hist[1]==1)){
+                    if((hist[0]==1 && hist[1]==0)||(hist[0]==1 && hist[1]==1)){
                             return Choice.COOPERATE;
                     } else return Choice.DEFECT;
             }
@@ -153,7 +142,6 @@ public class Prisoner extends Agent {
 
     @SuppressWarnings({"unchecked", "empty-statement"})
     public void respond(Message msg){
-        msg = (Message<Choice>) msg;
         Prisoner p = (Prisoner) msg.sender;
         if(history.get(p)==null){
             int[] initArray = {0,0};

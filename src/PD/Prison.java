@@ -5,7 +5,6 @@ import Agency.Dispatcher;
 
 public class Prison extends Dispatcher {
     public Prison(){
-        multiThread = false;
         Strategy s0000 = new Strategy("0000");
         Strategy s0001 = new Strategy("0001");
         Strategy s0010 = new Strategy("0010");
@@ -74,6 +73,7 @@ public class Prison extends Dispatcher {
 
     public static void main(String[] args) throws InterruptedException {
         Prison p = new Prison();
+        p.multiThread = true;
         p.start();
         for(Agent pris : Prison.agents){
             Prisoner prisoner = (Prisoner) pris;
